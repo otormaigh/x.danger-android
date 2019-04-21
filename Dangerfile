@@ -24,6 +24,10 @@ begin
   android_lint.lint(inline_mode: true)
 end
 
+# Detekt
+checkstyle_format.base_path = Dir.pwd
+checkstyle_format.report "build/reports/detekt/detekt.xml"
+
 # LGTM
 begin
   if status_report[:errors].length.zero? && status_report[:warnings].length.zero?

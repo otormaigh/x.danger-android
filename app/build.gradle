@@ -21,6 +21,7 @@ android {
 
   lintOptions {
     xmlReport true
+    ignore 'GoogleAppIndexingWarning'
   }
 }
 
