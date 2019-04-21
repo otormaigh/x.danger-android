@@ -40,3 +40,8 @@ detekt {
 task clean(type: Delete) {
   delete rootProject.buildDir
 }
+
+wrapper {
+  gradleVersion = "5.4"
+  distributionType = "all"
+}
