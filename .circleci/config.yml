@@ -36,7 +36,7 @@ jobs:
             - ~/.gradle/caches
             - ~/.gradle/wrapper
 
-  build:
+  assemble:
     <<: *config
 
     steps:
@@ -45,14 +45,32 @@ jobs:
           <<: *cache_key
 
       - run:
-          name: Build
-          command: ./gradlew build
+          name: Assemble
+          command: ./gradlew assemble
+
+  danger:
+    <<: *config
+
+    steps:
+      - checkout
+      - restore_cache:
+          <<: *cache_key
+
+      - run:
+          name: Bundle install
+          command: bundle check || bundle install
+      - run:
+          name: Danger
+          command: bundle exec danger
 
 workflows:
   version: 2
-  check_build:
+  danger_check_assemble:
     jobs:
-      - check
-      - build:
+      - danger
+      - check:
+          requires:
+            - danger
+      - assemble:
           requires:
             - check
