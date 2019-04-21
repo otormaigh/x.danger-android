@@ -2,9 +2,11 @@ require 'pry'
 
 # APK Stats
 apkstats.apk_filepath='app/build/outputs/apk/debug/danger-0.1-debug.apk'
-markdown [
-    "|Charactistics|Value|",
-    "|:----|:----|",
-    "| File size | %d |" % message(apkstats.file_size),
-    "| Download size | %d |" % message(apkstats.download_size)
-]
+
+md = +"### Apk comparision results" << "\n\n"
+md << "Property | Summary" << "\n"
+md << ":--- | :---" << "\n"
+md << "File Size | #{apkstats.file_size} Bytes " << "\n"
+md << "Download Size | #{apkstats.download_size} Bytes " << "\n"
+
+markdown(md)
