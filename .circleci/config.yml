@@ -29,6 +29,12 @@ jobs:
           path: build/reports/test-results
       - store_artifacts:
           path: build/reports/
+      - run:
+          name: Bundle install
+          command: bundle check || bundle install
+      - run:
+          name: Danger
+          command: bundle exec danger
 
       - save_cache:
           <<: *cache_key
@@ -48,29 +54,11 @@ jobs:
           name: Assemble
           command: ./gradlew assemble
 
-  danger:
-    <<: *config
-
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *cache_key
-
-      - run:
-          name: Bundle install
-          command: bundle check || bundle install
-      - run:
-          name: Danger
-          command: bundle exec danger
-
 workflows:
   version: 2
   danger_check_assemble:
     jobs:
       - check
-      - danger:
-          requires:
-            - check
       - assemble:
           requires:
             - check
