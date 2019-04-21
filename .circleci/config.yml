@@ -67,10 +67,10 @@ workflows:
   version: 2
   danger_check_assemble:
     jobs:
-      - check
-      - danger:
+      - danger
+      - check:
           requires:
-            - check
+            - danger
       - assemble:
           requires:
             - check

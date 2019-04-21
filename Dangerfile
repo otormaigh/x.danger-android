@@ -11,11 +11,10 @@ warn("Big PR") if git.lines_of_code > 500
 # Android Lint
 begin
   # Skip gradle lint task
-  # It means we need to run lint tasks before running Danger
-  android_lint.skip_gradle_task=true
+  android_lint.skip_gradle_task=false
 
   # Check modified/new files only
-  android_lint.filtering=true
+  android_lint.filtering=false
 
   # Default: Warning
   # android_lint.severity = "Error"
