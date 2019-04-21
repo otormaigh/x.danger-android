@@ -29,12 +29,14 @@ jobs:
           path: build/reports/test-results
       - store_artifacts:
           path: build/reports/
-      - run:
+      - run: &bundle_install_for_danger
           name: Bundle install
-          command: bundle check || bundle install
+          command: |
+            cd script/danger
+            bundle check || bundle install
       - run:
-          name: Danger
-          command: bundle exec danger
+          name: Danger assertions
+          command: script/danger_assert
 
       - save_cache:
           <<: *cache_key
@@ -53,6 +55,10 @@ jobs:
       - run:
           name: Assemble
           command: ./gradlew assemble
+      - run: *bundle_install_for_danger
+      - run:
+          name: Danger APK stats
+          command: script/danger_compare_apk
 
 workflows:
   version: 2
