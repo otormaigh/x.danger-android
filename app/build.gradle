@@ -21,8 +21,6 @@ android {
 
   lintOptions {
     xmlReport true
-    checkAllWarnings true
-    warningsAsErrors true
   }
 }
 

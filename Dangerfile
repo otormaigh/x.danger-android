@@ -11,7 +11,7 @@ warn("Big PR") if git.lines_of_code > 500
 # Android Lint
 begin
   # Skip gradle lint task
-  android_lint.skip_gradle_task=false
+  android_lint.skip_gradle_task=true
 
   # Check modified/new files only
   android_lint.filtering=false
