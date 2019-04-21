@@ -28,6 +28,19 @@ end
 checkstyle_format.base_path = Dir.pwd
 checkstyle_format.report "build/reports/detekt/detekt.xml"
 
+# APK Stats
+begin
+  apkstats.apk_filepath='app/build/outputs/apk/debug/danger-0.1-debug.apk'
+  markdown [
+      "|Charactistics|Value|",
+      "|:----|:----|",
+      "| File size | %s |" % message(apkstats.file_size),
+      "| Download size | %s |" % message(apkstats.download_size)
+  ]
+
+end
+
+
 # LGTM
 begin
   if status_report[:errors].length.zero? && status_report[:warnings].length.zero?
