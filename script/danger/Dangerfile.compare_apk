@@ -1,0 +1,5 @@
+require 'pry'
+
+# APK Stats
+apkstats.apk_filepath='app/build/outputs/apk/debug/danger-0.1-debug.apk'
+apkstats.compare_with('old.apk', do_report: true)

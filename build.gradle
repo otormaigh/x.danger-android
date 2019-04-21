@@ -11,6 +11,10 @@ buildscript {
   }
 }
 
+plugins {
+  id "io.gitlab.arturbosch.detekt" version "1.0.0-RC14"
+}
+
 allprojects {
   repositories {
     google()
@@ -19,6 +23,25 @@ allprojects {
   }
 }
 
+detekt {
+  toolVersion = "1.0.0-RC14"
+  config = files("$rootDir/detekt.yml")
+  input = files("$rootDir/app")
+  filters = ".*Test.*,.*AndroidTest.*,.*/resources/.*,.*/tmp/.*,.*/build/.*"
+  failFast = true
+  reports {
+    html {
+      enabled = true
+      destination = file("$projectDir/app/build/reports/detekt/detekt.html")
+    }
+  }
+}
+
 task clean(type: Delete) {
   delete rootProject.buildDir
+}
+
+wrapper {
+  gradleVersion = "5.4"
+  distributionType = "all"
 }

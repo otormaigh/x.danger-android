@@ -1,0 +1,4 @@
+build:
+  # Work around to not fail the build until this PR is merged and released.
+  # https://github.com/arturbosch/detekt/pull/1600
+  maxIssues: 1000
