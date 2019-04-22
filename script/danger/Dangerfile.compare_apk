@@ -1,5 +1,5 @@
 require 'pry'
 
 # APK Stats
-apkstats.apk_filepath='app/build/outputs/apk/release/danger-0.1-release-unsigned.apk'
+apkstats.apk_filepath='app/build/outputs/apk/release/danger-0.3-release-unsigned.apk'
 apkstats.compare_with('latest-release.apk', do_report: true)
