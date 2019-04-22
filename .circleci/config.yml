@@ -127,7 +127,7 @@ jobs:
       - persist_to_workspace:
           root: app
           paths:
-            - build/outputs/apk/release/*.apk
+            - build/outputs/apk/release/danger-0.3-release-unsigned.apk
 
   publish-github-release:
     working_directory: ~/danger
