@@ -65,6 +65,18 @@ jobs:
           name: Danger APK stats
           command: script/danger_compare_apk
 
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=0.3
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/app/build/outputs/apk/release/danger-0.3-release-unsigned.apk
+
 workflows:
   version: 2
   danger_check_assemble:
@@ -73,3 +85,11 @@ workflows:
       - assemble:
           requires:
             - check
+      - publish-github-release:
+          requires:
+            - assemble
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+$/
