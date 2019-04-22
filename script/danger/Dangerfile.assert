@@ -16,7 +16,7 @@ begin
   android_lint.skip_gradle_task=true
 
   # Check modified/new files only
-  android_lint.filtering=false
+  android_lint.filtering=true
 
   # Default: Warning
   # android_lint.severity = "Error"
@@ -29,6 +29,7 @@ end
 # Detekt
 checkstyle_format.base_path = Dir.pwd
 checkstyle_format.report "build/reports/detekt/detekt.xml"
+checkstyle_format.filtering=true
 
 
 # LGTM
