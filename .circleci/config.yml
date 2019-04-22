@@ -87,7 +87,7 @@ workflows:
             - check
       - publish-github-release:
           requires:
-            - build
+            - assemble
           filters:
             branches:
               ignore: /.*/
