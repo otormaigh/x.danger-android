@@ -127,7 +127,7 @@ jobs:
       - persist_to_workspace:
           root: app
           paths:
-            - build/outputs/apk/release/danger-0.3-release-unsigned.apk
+            - build/outputs/
 
   publish-github-release:
     working_directory: ~/danger
@@ -138,7 +138,7 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ghr -t ${DANGER_GITHUB_API_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} app/build/outputs/apk/release/danger-0.3-release-unsigned.apk
+            ghr -t ${DANGER_GITHUB_API_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} app/build/outputs/apk/release/danger-0.4-release-unsigned.apk
 
 workflows:
   version: 2
