@@ -34,6 +34,10 @@ detekt {
       enabled = true
       destination = file("$projectDir/app/build/reports/detekt/detekt.html")
     }
+    xml {
+      enabled = true
+      destination = file("$projectDir/app/build/reports/detekt/detekt.xml")
+    }
   }
 }
 

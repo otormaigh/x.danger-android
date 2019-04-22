@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 aliases:
   - &restore_gradle_cache
@@ -8,6 +8,31 @@ aliases:
     paths:
       - ~/.gradle/caches
       - ~/.gradle/wrapper
+  - &install_bundle
+    name: Install bundle dependencies
+    command: |
+      cd script/danger
+      bundle check || bundle install
+
+attach_workspace: &attach_workspace
+  attach_workspace:
+    at: .
+
+store_reports: &store_reports
+  store_artifacts:
+    path: app/build/reports
+
+store_test_resulst: &store_test_results
+  store_test_results:
+    path: app/build/test-results
+
+commands:
+  attach_restore_workspace:
+    description: Restore the workspace from cache
+    steps:
+      - checkout
+      - *attach_workspace
+      - restore_cache: *restore_gradle_cache
 
 config: &config
   working_directory: ~/danger
@@ -18,58 +43,91 @@ config: &config
     TERM: dumb
 
 jobs:
-  check:
+  checkout_code:
     <<: *config
-
     steps:
       - checkout
       - restore_cache: *restore_gradle_cache
-
       - run:
-          name: Check
-          command: ./gradlew check detekt test
-      - store_artifacts:
-          path: app/build/reports
-      - store_test_results:
-          path: build/reports/test-results
-      - store_artifacts:
-          path: build/reports/
-      - run: &bundle_install_for_danger
-          name: Bundle install
-          command: |
-            cd script/danger
-            bundle check || bundle install
+          name: Install dependencies
+          command: ./gradlew dependencies
+      - save_cache: *save_gradle_cache
+
+  lint:
+    <<: *config
+    steps:
+      - attach_restore_workspace
+      - run:
+          name: Lint
+          command: ./gradlew lint
+      - *store_reports
+      - save_cache: *save_gradle_cache
+      - persist_to_workspace:
+          root: app
+          paths:
+            - build/reports/lint-results.xml
+
+  detekt:
+    <<: *config
+    steps:
+      - attach_restore_workspace
+      - run:
+          name: Detekt
+          command: ./gradlew detekt
+      - *store_reports
+      - save_cache: *save_gradle_cache
+      - persist_to_workspace:
+          root: app
+          paths:
+            - build/reports/detekt/detekt.xml
+
+  test:
+    <<: *config
+    steps:
+      - attach_restore_workspace
+      - run:
+          name: Test
+          command: ./gradlew test
+      - *store_test_results
+      - save_cache: *save_gradle_cache
+
+  danger_assert:
+    <<: *config
+    steps:
+      - attach_restore_workspace
+      - run: *install_bundle
       - run:
           name: Danger assertions
           command: script/danger_assert
 
-      - save_cache: *save_gradle_cache
+  danger_apk_stat:
+    <<: *config
+    steps:
+      - attach_restore_workspace
+      - run: *install_bundle
+      - run:
+          name: Danger APK stats
+          command: script/danger_compare_apk
 
   assemble:
     <<: *config
 
     steps:
-      - checkout
-      - restore_cache: *restore_gradle_cache
+      - attach_restore_workspace
 
       - run:
           name: Assemble
           command: ./gradlew assemble
       - store_artifacts:
           path: app/build/outputs
-      - persist_to_workspace:
-          root: app
-          paths:
-            - build/outputs
       - run:
           name: Fetch lastet release
           command: script/download_latest_apk latest-release.apk
-      - run: *bundle_install_for_danger
-      - run:
-          name: Danger APK stats
-          command: script/danger_compare_apk
-
       - save_cache: *save_gradle_cache
+      - persist_to_workspace:
+          root: app
+          paths:
+            - build/outputs/apk/release/*.apk
 
   publish-github-release:
     working_directory: ~/danger
@@ -87,16 +145,32 @@ workflows:
   version: 2
   danger_check_assemble:
     jobs:
-      - check:
-          filters:
-            tags:
-              only: /^\d+\.\d+$/
+      - checkout_code
+      - lint:
+          requires:
+            - checkout_code
+      - detekt:
+          requires:
+            - checkout_code
+      - test:
+          requires:
+            - checkout_code
       - assemble:
           requires:
-            - check
+            - lint
+            - detekt
+            - test
           filters:
             tags:
               only: /^\d+\.\d+$/
+      - danger_assert:
+          requires:
+            - lint
+            - detekt
+            - test
+      - danger_apk_stat:
+          requires:
+            - assemble
       - publish-github-release:
           requires:
             - assemble
