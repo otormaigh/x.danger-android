@@ -16,7 +16,7 @@ aliases:
 
 attach_workspace: &attach_workspace
   attach_workspace:
-    at: .
+    at: app
 
 store_reports: &store_reports
   store_artifacts:
@@ -134,8 +134,7 @@ jobs:
     docker:
       - image: cibuilds/github:0.10
     steps:
-      - attach_workspace:
-          at: app
+      - *attach_workspace
       - run:
           name: "Publish Release on GitHub"
           command: |
