@@ -57,6 +57,10 @@ jobs:
           command: ./gradlew assemble
       - store_artifacts:
           path: app/build/outputs
+      - persist_to_workspace:
+          root: app
+          paths:
+            - build/outputs
       - run:
           name: Fetch lastet release
           command: script/download_latest_apk latest-release.apk
@@ -66,25 +70,31 @@ jobs:
           command: script/danger_compare_apk
 
   publish-github-release:
+    working_directory: ~/danger
     docker:
       - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
-          at: ./artifacts
+          at: app
       - run:
           name: "Publish Release on GitHub"
           command: |
-            VERSION=0.3
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/app/build/outputs/apk/release/danger-0.3-release-unsigned.apk
+            ghr -t ${DANGER_GITHUB_API_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} app/build/outputs/apk/release/danger-0.3-release-unsigned.apk
 
 workflows:
   version: 2
   danger_check_assemble:
     jobs:
-      - check
+      - check:
+          filters:
+            tags:
+              only: /^\d+\.\d+$/
       - assemble:
           requires:
             - check
+          filters:
+            tags:
+              only: /^\d+\.\d+$/
       - publish-github-release:
           requires:
             - assemble
