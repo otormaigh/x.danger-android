@@ -10,9 +10,7 @@ aliases:
       - ~/.gradle/wrapper
   - &install_bundle
     name: Install bundle dependencies
-    command: |
-      cd script/danger
-      bundle check || bundle install
+    command: bundle check || bundle install
 
 attach_workspace: &attach_workspace
   attach_workspace:
@@ -41,6 +39,8 @@ config: &config
   parallelism: 1
   environment:
     TERM: dumb
+    BUNDLE_PATH: "script/danger/vendor/bundle"
+    BUNDLE_GEMFILE: "script/danger/Gemfile"
 
 jobs:
   checkout_code:
@@ -98,7 +98,7 @@ jobs:
       - run: *install_bundle
       - run:
           name: Danger assertions
-          command: script/danger_assert
+          command: bundle exec danger --dangerfile="script/danger/Dangerfile.assert" --danger_id='assertions' --remove-previous-comments
 
   danger_apk_stat:
     <<: *config
@@ -110,7 +110,7 @@ jobs:
           command: script/download_latest_apk latest-release.apk
       - run:
           name: Danger APK stats
-          command: script/danger_compare_apk
+          command: bundle exec danger --dangerfile="script/danger/Dangerfile.compare_apk" --danger_id='compare-apk' --remove-previous-comments
 
   assemble:
     <<: *config
