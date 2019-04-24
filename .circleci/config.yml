@@ -32,6 +32,7 @@ commands:
       - *attach_workspace
       - restore_cache: *restore_gradle_cache
 
+
 config: &config
   working_directory: ~/danger
   docker:
@@ -114,10 +115,8 @@ jobs:
 
   assemble:
     <<: *config
-
     steps:
       - attach_restore_workspace
-
       - run:
           name: Assemble
           command: ./gradlew assemble
@@ -142,6 +141,30 @@ jobs:
 
 workflows:
   version: 2
+  build:
+    jobs:
+      - checkout_code
+      - assemble:
+          requires:
+            - checkout_code
+  build_deploy:
+    jobs:
+      - checkout_code:
+          filters:
+            branches:
+              only: master
+      - assemble:
+          requires:
+            - checkout_code
+          filters:
+            branches:
+              only: master
+      - publish-github-release:
+          requires:
+            - assemble
+          filters:
+            branches:
+              only: master
   danger_check_assemble:
     jobs:
       - checkout_code
